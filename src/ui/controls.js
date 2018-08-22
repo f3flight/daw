@@ -10,6 +10,7 @@ class uiControls {
 		dom.togglePlay.onclick = this._onclickTogglePlay.bind( this );
 		dom.play.onclick = this._onclickPlay.bind( this );
 		dom.stop.onclick = this._onclickStop.bind( this );
+		dom.record.onclick = this._onclickRecord.bind( this );
 		if ( document.cookie.indexOf( "cookieAccepted" ) > -1 ) {
 			dom.eatCookies.remove();
 		} else {
@@ -104,6 +105,13 @@ class uiControls {
 	}
 	_onclickStop() {
 		gs.controls.stop();
+		return false;
+	}
+	_onclickRecord() {
+		// gs.controls.stop();
+		navigator.mediaDevices.getUserMedia({audio: true, video: false}).then((stream) => {
+			dom.record_obj.srcObject = stream;
+		});
 		return false;
 	}
 	_onclickCookies() {

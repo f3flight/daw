@@ -108,10 +108,31 @@ class uiControls {
 		return false;
 	}
 	_onclickRecord() {
-		// gs.controls.stop();
-		navigator.mediaDevices.getUserMedia({audio: true, video: false}).then((stream) => {
-			dom.record_obj.srcObject = stream;
-		});
+		const audioType = 'audio/webm;codecs=pcm';
+		if ('mediaRecorder' in this) {
+			this.mediaRecorder.stop();
+			delete this.mediaRecorder;
+		} else {
+			navigator.mediaDevices.getUserMedia({audio: true, video: false}).then((stream) => {
+				var chunks = [];
+				var mediaRecorder = new MediaRecorder(stream, {mimeType: audioType});
+				this.mediaRecorder = mediaRecorder;
+				mediaRecorder.ondataavailable = function(e) {
+					chunks.push(e.data);
+				};
+				mediaRecorder.onstop = function(e) {
+					var blob = new Blob(chunks, {'type': audioType});
+					var audioURL = URL.createObjectURL(blob);
+					dom.record_obj.src = audioURL;
+				};
+				mediaRecorder.onerror = function(e) {
+					alert("mediaRecorder error: " + e.error.name);
+				};
+				mediaRecorder.start();
+
+
+			});
+		}
 		return false;
 	}
 	_onclickCookies() {
